@@ -40,10 +40,10 @@ public class EmployeeAction extends ActionBase {
      * @throws ServleException
      * @throws IOException
      */
-    public void index() throws ServletException, IOException{
+    public void index() throws ServletException, IOException {
 
         //指定されたページ数の一覧画面に表示するデータを取得
-        int page =  getPage();
+        int page = getPage();
         List<EmployeeView> employees = service.getPerPage(page);
 
         //全ての従業員データの件数を取得
@@ -51,10 +51,10 @@ public class EmployeeAction extends ActionBase {
 
         putRequestScope(AttributeConst.EMPLOYEES, employees); //取得した従業員データ
         putRequestScope(AttributeConst.EMP_COUNT, employeeCount); //全ての従業員データの件数
-        putRequestScope(AttributeConst.PAGE,page); //ページ数
-        putRequestScope(AttributeConst.MAX_ROW,JpaConst.ROW_PER_PAGE); //1ページに表示するレコードの数
+        putRequestScope(AttributeConst.PAGE, page); //ページ数
+        putRequestScope(AttributeConst.MAX_ROW, JpaConst.ROW_PER_PAGE); //1ページに表示するレコードの数
 
-      //セッションにフラッシュメッセージが設定されている場合はリクエストスコープに移し替え、セッションからは削除する
+        //セッションにフラッシュメッセージが設定されている場合はリクエストスコープに移し替え、セッションからは削除する
         String flush = getSessionScope(AttributeConst.FLUSH);
         if (flush != null) {
             putRequestScope(AttributeConst.FLUSH, flush);
@@ -85,10 +85,10 @@ public class EmployeeAction extends ActionBase {
      * @throws ServletException
      * @throws IOException
      */
-    public void create() throws ServletException, IOException{
+    public void create() throws ServletException, IOException {
 
         //CSRF対策　tokenのチェック
-        if(checkToken()) {
+        if (checkToken()) {
 
             //パラメータの値を元に従業員情報のインスタンスを作成する
             EmployeeView ev = new EmployeeView(
@@ -107,7 +107,7 @@ public class EmployeeAction extends ActionBase {
             //従業員情報登録
             List<String> errors = service.create(ev, pepper);
 
-            if(errors.size() > 0) {
+            if (errors.size() > 0) {
                 //登録中にエラーがあった場合
 
                 putRequestScope(AttributeConst.TOKEN, getTokenId());//CSRF対策用トークン
@@ -116,28 +116,29 @@ public class EmployeeAction extends ActionBase {
 
                 //新規登録画面を再表示
                 forward(ForwardConst.FW_REP_NEW);
-            }else {
+            } else {
                 //登録中にエラーがなかった場合
 
                 //セッションに登録完了のフラッシュメッセージを設定
                 putSessionScope(AttributeConst.FLUSH, MessageConst.I_REGISTERED.getMessage());
 
-              //一覧画面にリダイレクト
+                //一覧画面にリダイレクト
                 redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
             }
         }
     }
+
     /*
      * 詳細画面を表示する
      * @throws ServletExcetion
      * @throws IOException
      */
-    public void show() throws ServletException, IOException{
+    public void show() throws ServletException, IOException {
 
         //idを条件に従業員データを取得する
         EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
 
-        if(ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
+        if (ev == null || ev.getDeleteFlag() == AttributeConst.DEL_FLAG_TRUE.getIntegerValue()) {
 
             //データが所得できなかった、または論理削除されている場合はエラー画面を表示
             forward(ForwardConst.FW_ERR_UNKNOWN);
@@ -173,5 +174,52 @@ public class EmployeeAction extends ActionBase {
         //編集画面を表示する
         forward(ForwardConst.FW_EMP_EDIT);
 
+    }
+
+    /**
+     * 更新を行う
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void update() throws ServletException, IOException {
+
+        //CSRF対策　tokenのチェック
+        if (checkToken()) {
+            //パラメータの値を元に従業員情報のインスタンスを作成する
+            EmployeeView ev = new EmployeeView(
+                    toNumber(getRequestParam(AttributeConst.EMP_ID)),
+                    getRequestParam(AttributeConst.EMP_CODE),
+                    getRequestParam(AttributeConst.EMP_NAME),
+                    getRequestParam(AttributeConst.EMP_PASS),
+                    toNumber(getRequestParam(AttributeConst.EMP_ADMIN_FLG)),
+                    null,
+                    null,
+                    AttributeConst.DEL_FLAG_FALSE.getIntegerValue());
+
+            //アプリケーションスコープからpepper文字列を取得
+            String pepper = getContextScope(PropertyConst.PEPPER);
+
+            //従業員情報更新
+            List<String> errors = service.update(ev, pepper);
+
+            if (errors.size() > 0) {
+                //更新中にエラーが発生した場合
+
+                putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策トークン
+                putRequestScope(AttributeConst.EMPLOYEE, ev); //入力された従業員情報
+                putRequestScope(AttributeConst.ERR, errors); //エラーリスト
+
+                //編集画面を再表示
+                forward(ForwardConst.FW_EMP_EDIT);
+            } else {
+                //更新中にエラーがなかった場合
+
+                //セッションに更新完了のフラッシュメッセージを設定
+                putSessionScope(AttributeConst.FLUSH, MessageConst.I_UPDATED.getMessage());
+
+                //一覧画面にリダイレクト
+                redirect(ForwardConst.ACT_EMP, ForwardConst.CMD_INDEX);
+            }
+        }
     }
 }
