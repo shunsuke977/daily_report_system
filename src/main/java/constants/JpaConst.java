@@ -13,7 +13,7 @@ public interface JpaConst {
     int ROW_PER_PAGE = 15; //1ページに表示するレコードの数
 
     //従業員テーブル
-    String TABLE_EMP ="employees"; //テーブル名
+    String TABLE_EMP = "employees"; //テーブル名
     //従業員テーブルカラム
     String EMP_COL_ID = "id"; //id
     String EMP_COL_CODE = "code"; //社員番号
@@ -24,13 +24,13 @@ public interface JpaConst {
     String EMP_COL_UPDATED_AT = "updated_at"; //更新日時
     String EMP_COL_DELETE_FLAG = "delete_flag"; //削除フラグ
 
-    int ROLE_ADMIN = 1; //管理者権限NO（管理者）
-    int ROLE_GENERAL = 0; //管理者権限OFF（一般）
-    int EMP_DEL_TRUE = 1; //削除フラグNO（削除済み）
-    int EMP_DEL_FALSE = 0; //削除フラグOFF（現役）
+    int ROLE_ADMIN = 1; //管理者権限ON(管理者)
+    int ROLE_GENERAL = 0; //管理者権限OFF(一般)
+    int EMP_DEL_TRUE = 1; //削除フラグON(削除済み)
+    int EMP_DEL_FALSE = 0; //削除フラグOFF(現役)
 
     //日報テーブル
-    String TEBLE_REP = "reports"; //テーブル名
+    String TABLE_REP = "reports"; //テーブル名
     //日報テーブルカラム
     String REP_COL_ID = "id"; //id
     String REP_COL_EMP = "employee_id"; //日報を作成した従業員のid
@@ -74,7 +74,5 @@ public interface JpaConst {
     //指定した従業員が作成した日報の件数を取得する
     String Q_REP_COUNT_ALL_MINE = ENTITY_REP + ".countAllMine";
     String Q_REP_COUNT_ALL_MINE_DEF = "SELECT COUNT(r) FROM Report AS r WHERE r.employee = :" + JPQL_PARM_EMPLOYEE;
-
-
 
 }

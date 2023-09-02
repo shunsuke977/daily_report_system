@@ -61,7 +61,7 @@ public abstract class ActionBase {
             //パラメータからcommandを取得
             String command = request.getParameter(ForwardConst.CMD.getValue());
 
-            //commandに該当するメソッドを実行する
+            //ommandに該当するメソッドを実行する
             //(例: action=Employee command=show の場合 EmployeeActionクラスのshow()メソッドを実行する)
             commandMethod = this.getClass().getDeclaredMethod(command, new Class[0]);
             commandMethod.invoke(this, new Object[0]); //メソッドに渡す引数はなし
@@ -135,6 +135,7 @@ public abstract class ActionBase {
         } else {
             return true;
         }
+
     }
 
     /**
@@ -163,10 +164,10 @@ public abstract class ActionBase {
      * @param strNumber 変換前文字列
      * @return 変換後数値
      */
-    protected int toNumber(String strNamber) {
+    protected int toNumber(String strNumber) {
         int number = 0;
         try {
-            number = Integer.parseInt(strNamber);
+            number = Integer.parseInt(strNumber);
         } catch (Exception e) {
             number = Integer.MIN_VALUE;
         }
@@ -239,4 +240,5 @@ public abstract class ActionBase {
     protected <R> R getContextScope(PropertyConst key) {
         return (R) context.getAttribute(key.getValue());
     }
+
 }
