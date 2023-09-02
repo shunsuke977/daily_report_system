@@ -143,6 +143,7 @@ public class EmployeeAction extends ActionBase {
             forward(ForwardConst.FW_ERR_UNKNOWN);
             return;
         }
+       
         putRequestScope(AttributeConst.EMPLOYEE, ev); //取得した従業員情報
 
         //詳細画面を表示
