@@ -199,7 +199,7 @@ public abstract class ActionBase {
      * @param key パラメータ名
      * @param value パラメータの値
      */
-    protected <V> void putRquestScope(AttributeConst key, V value) {
+    protected <V> void putRequestScope(AttributeConst key, V value) {
         request.setAttribute(key.getValue(), value);
     }
 
