@@ -114,4 +114,27 @@ public class AuthAction extends ActionBase {
         redirect(ForwardConst.ACT_AUTH, ForwardConst.CMD_LOGIN);
     }
 
+    /**
+     * ログイン中の従業員か管理者かどうかチェックし、管理者でなければエラー画面を表示
+     * true: 管理者　false: 管理者ではない
+     * @throws ServletException
+     * @throws IOException
+     */
+    private boolean checkAdmin() throws ServletException, IOException {
+
+        //セッションログイン中の従業員情報を取得
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+        //管理者でなければエラー画面を表示
+        if(ev.getAdminFlag() != AttributeConst.ROLE_ADMIN.getIntegerValue()) {
+            forward(ForwardConst.FW_ERR_UNKNOWN);
+            return false;
+
+        }else {
+
+            return true;
+        }
+
+    }
+
 }
