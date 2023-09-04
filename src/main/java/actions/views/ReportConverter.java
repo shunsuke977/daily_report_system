@@ -16,9 +16,25 @@ public class ReportConverter {
      * @param rv ReportViewのインスタンス
      * @return Reportのインスタンス
      */
+    public static Report toModel(ReportView rv) {
+        return new Report(
+                rv.getId(),
+                EmployeeConverter.toModel(rv.getEmployee()),
+                rv.getReportDate(),
+                rv.getTitle(),
+                rv.getContent(),
+                rv.getCreatedAt(),
+                rv.getUpdatedAt());
+    }
+
+    /**
+     * DTOモデルのインスタンスからViewモデルのインスタンスを作成する
+     * @param r Reportのインスタンス
+     * @return ReportViewのインスタンス
+     */
     public static ReportView toView(Report r) {
 
-        if(r == null) {
+        if (r == null) {
             return null;
         }
 
