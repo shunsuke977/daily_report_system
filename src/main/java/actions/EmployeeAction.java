@@ -123,7 +123,7 @@ public class EmployeeAction extends ActionBase {
                 putRequestScope(AttributeConst.ERR, errors);//エラーのリスト
 
                 //新規登録画面を再表示
-                forward(ForwardConst.FW_REP_NEW);
+                forward(ForwardConst.FW_EMP_NEW);
             } else {
                 //登録中にエラーがなかった場合
 
@@ -136,15 +136,12 @@ public class EmployeeAction extends ActionBase {
         }
     }
 
-    /*
+    /**
      * 詳細画面を表示する
      * @throws ServletExcetion
      * @throws IOException
      */
     public void show() throws ServletException, IOException {
-
-        //管理者かどうかチェック
-        if (checkAdmin()) {
 
             //idを条件に従業員データを取得する
             EmployeeView ev = service.findOne(toNumber(getRequestParam(AttributeConst.EMP_ID)));
@@ -162,7 +159,7 @@ public class EmployeeAction extends ActionBase {
             forward(ForwardConst.FW_EMP_SHOW);
         }
 
-    }
+
 
     /**
      * 編集画面を表示する
