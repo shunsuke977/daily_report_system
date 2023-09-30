@@ -2,16 +2,24 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ page import="constants.ForwardConst" %>
+<%@ page import="constants.AttributeConst"%>
 
 <c:set var="actRep" value="${ForwardConst.ACT_REP.getValue()}" />
 <c:set var="commIdx" value="${ForwardConst.CMD_INDEX.getValue()}" />
 <c:set var="commEdt" value="${ForwardConst.CMD_EDIT.getValue()}" />
+<c:set var="commAddLike" value="${ForwardConst.CMD_ADD_LIKE.getValue()}" />
+<c:set var="commReduceLike" value="${ForwardConst.CMD_REDUCE_LIKE.getValue()}" />
 
 <c:import url="/WEB-INF/views/layout/app.jsp">
     <c:param name="content">
 
         <h2>日報 詳細ページ</h2>
 
+        <c:if test="${flush != null}">
+            <div id="flush_success">
+                <c:out value="${flush}"></c:out>
+            </div>
+        </c:if>
         <table>
             <tbody>
                 <tr>
@@ -41,11 +49,28 @@
         </table>
 
         <c:if test="${sessionScope.login_employee.id == report.employee.id}">
-            <p>
-                <a href="<c:url value='?action=${actRep}&command=${commEdt}&id=${report.id}' />">この日報を編集する</a>
-            </p>
+                <p>
+                    <a href="<c:url value='?action=${actRep}&command=${commEdt}&id=${report.id}' />">この日報を編集する</a>
+                </p>
         </c:if>
 
+         <div class="like">
+            <c:choose>
+                <c:when test="${like != null}">
+                    <p>
+                        <a
+                            href="<c:url value='?action=${actRep}&command=${commReduceLike}&id=${report.id}&_token=${_token}' />">いいねを取り消す</a>
+                    </p>
+                </c:when>
+                <c:otherwise>
+                    <p>
+                        <a
+                            href="<c:url value='?action=${actRep}&command=${commAddLike}&id=${report.id}&_token=${_token}' />">いいね！</a>
+                    </p>
+                </c:otherwise>
+            </c:choose>
+
+        </div>
         <p>
             <a href="<c:url value='?action=${actRep}&command=${commIdx}' />">一覧に戻る</a>
         </p>

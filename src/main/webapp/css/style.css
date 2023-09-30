@@ -22,7 +22,7 @@ h1 {
 }
 
 h2 {
-    font-size: 36px;
+    font-size: 28px;
     margin-bottom: 15px;
 }
 
@@ -154,4 +154,13 @@ pre{
 }
 h3 {
     font-size: larger;
+}
+
+.menu h2 {
+    display: inline;
+    margin-right: 20px;
+}
+
+.like p {
+    display: inline-block;
 }

@@ -11,6 +11,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import actions.views.ReportView;
 import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.PropertyConst;
@@ -108,6 +109,28 @@ public abstract class ActionBase {
         String redirectUrl = request.getContextPath() + "/?action=" + action.getValue();
         if (command != null) {
             redirectUrl = redirectUrl + "&command=" + command.getValue();
+        }
+
+        //URLへリダイレクト
+        response.sendRedirect(redirectUrl);
+
+    }
+
+    /**
+     * URLを構築しリダイレクトを行う
+     * @param action パラメータに設定する値
+     * @param command パラメータに設定する値
+     * @param id パラメータに設定する値
+     * @throws ServletException
+     * @throws IOException
+     */
+    protected void redirect(ForwardConst action, ForwardConst command, ReportView rv)
+            throws ServletException, IOException {
+
+        //URLを構築
+        String redirectUrl = request.getContextPath() + "/?action=" + action.getValue();
+        if (command != null) {
+            redirectUrl = redirectUrl + "&command=" + command.getValue() + "&id=" + rv.getId();
         }
 
         //URLへリダイレクト

@@ -101,4 +101,19 @@ public class EmployeeConverter {
 
     }
 
+    /**
+     * ViewモデルのリストからDTOモデルのリストを作成する
+     * @param list Viesモデルのリスト
+     * @return DTOモデルのリスト
+     */
+    public static List<Employee> toModelList(List<EmployeeView> list) {
+        List<Employee> es = new ArrayList<>();
+
+        for (EmployeeView ev : list) {
+            es.add(toModel(ev));
+        }
+
+        return es;
+    }
+
 }

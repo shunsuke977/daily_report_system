@@ -12,6 +12,7 @@ import constants.AttributeConst;
 import constants.ForwardConst;
 import constants.JpaConst;
 import constants.MessageConst;
+import models.Like;
 import services.ReportService;
 
 /**
@@ -149,18 +150,38 @@ public class ReportAction extends ActionBase {
 
         //idを条件に日報データを取得する
         ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+        //セッションからログイン中の従業員情報を取得
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
 
         if (rv == null) {
             //該当の日報データが存在しない場合はエラー画面を表示
             forward(ForwardConst.FW_ERR_UNKNOWN);
 
         } else {
+            //自分がこの日報idにいいねしたかどうか、いいねデータを確認
+            Like like = service.findOne(rv, ev);
+
+            //日報データをもとにいいねの件数を取得する
+            long likesCount = service.countLike(rv);
+
+            putRequestScope(AttributeConst.TOKEN, getTokenId()); //CSRF対策用トークン
 
             putRequestScope(AttributeConst.REPORT, rv); //取得した日報データ
+            putRequestScope(AttributeConst.LIKE_COUNT, likesCount); //いいねの件数
+            putRequestScope(AttributeConst.LIKE, like); //いいねデータ
+
+            //セッションにフラッシュメッセージが設定されている場合はリクエストスコープに移し替え、セッションからは削除する
+            String flush = getSessionScope(AttributeConst.FLUSH);
+            if (flush != null) {
+                putRequestScope(AttributeConst.FLUSH, flush);
+                removeSessionScope(AttributeConst.FLUSH);
+            }
 
             //詳細画面を表示
             forward(ForwardConst.FW_REP_SHOW);
         }
+
     }
 
     /**
@@ -187,6 +208,7 @@ public class ReportAction extends ActionBase {
 
             //編集画面を表示
             forward(ForwardConst.FW_REP_EDIT);
+
         }
     }
 
@@ -231,5 +253,83 @@ public class ReportAction extends ActionBase {
 
             }
         }
+    }
+
+    /**
+     * いいねデータを登録する
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void addLike() throws ServletException, IOException {
+        if (checkToken()) {
+            //idを条件に日報データを取得する
+            ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+            //セッションからログイン中の従業員情報を取得
+            EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+            if (rv == null) {
+                //該当の日報データが存在しない場合はエラー画面を表示
+                forward(ForwardConst.FW_ERR_UNKNOWN);
+            } else {
+                service.createLike(rv, ev);
+
+                //セッションに更新完了のフラッシュメッセージを設定
+                putSessionScope(AttributeConst.FLUSH, MessageConst.L_REGISTERED.getMessage());
+
+                //詳細画面にリダイレクト
+                redirect(ForwardConst.ACT_REP, ForwardConst.CMD_SHOW, rv);
+            }
+        }
+    }
+
+    /**
+     * いいねを取り消す
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void reduceLike() throws ServletException, IOException {
+        if (checkToken()) {
+
+            //idを条件に日報データを取得する
+            ReportView rv = service.findOne(toNumber(getRequestParam(AttributeConst.REP_ID)));
+            //セッションからログイン中の従業員情報を取得
+            EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+            if (rv == null) {
+                //該当の日報データが存在しない場合はエラー画面を表示
+                forward(ForwardConst.FW_ERR_UNKNOWN);
+            } else {
+                service.delete(service.findOne(rv, ev));
+
+                //セッションに更新完了のフラッシュメッセージを設定
+                putSessionScope(AttributeConst.FLUSH, MessageConst.L_DELETED.getMessage());
+
+                //詳細画面にリダイレクト
+                redirect(ForwardConst.ACT_REP, ForwardConst.CMD_SHOW, rv);
+            }
+        }
+    }
+
+    /**
+     * いいねした日報の一覧画面を表示する
+     * @throws ServletException
+     * @throws IOException
+     */
+    public void myFavorite() throws ServletException, IOException {
+        //セッションからログイン中の従業員情報を取得
+        EmployeeView ev = (EmployeeView) getSessionScope(AttributeConst.LOGIN_EMP);
+
+        int page = getPage();
+        List<ReportView> reports = service.getMyFavoriteReportsPerPage(ev, page);
+        //全日報データの件数を取得
+        long reportsCount = service.countMyFavoriteReports(ev);
+
+        putRequestScope(AttributeConst.REPORTS, reports); //取得した日報データ
+        putRequestScope(AttributeConst.REP_COUNT, reportsCount); //全ての日報データの件数
+        putRequestScope(AttributeConst.PAGE, page); //ページ数
+        putRequestScope(AttributeConst.MAX_ROW, JpaConst.ROW_PER_PAGE); //1ページに表示するレコードの数
+
+        //一覧画面を表示
+        forward(ForwardConst.FW_REP_MYFABORITE);
     }
 }
